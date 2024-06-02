@@ -43,11 +43,11 @@ parser.add_argument('--contact_state_cnn_input_size', default="128", help="input
 parser.add_argument('--cuda_device', default=0, help='CUDA device id', type=int)
 parser.add_argument('--base_lr', default=0.001, help='base learning rate.', type=float)
 parser.add_argument('--ims_per_batch', default=4, help='ims per batch', type=int)
-parser.add_argument('--solver_steps', default=[40000, 60000], help='solver_steps', nargs='+', type=int)
-parser.add_argument('--max_iter', default=80000, help='max_iter', type=int)
-parser.add_argument('--checkpoint_period', default=5000, help='checkpoint_period', type=int)
-parser.add_argument('--eval_period', default=5000, help='eval_period', type=int)
-parser.add_argument('--warmup_iters', default=1000, help='warmup_iters', type=int)
+parser.add_argument('--solver_steps', default=[500], help='solver_steps', nargs='+', type=int) #[40000, 60000] to [500]
+parser.add_argument('--max_iter', default=1000, help='max_iter', type=int) #80000 to 1000
+parser.add_argument('--checkpoint_period', default=50, help='checkpoint_period', type=int) #5000 to 50
+parser.add_argument('--eval_period', default=50, help='eval_period', type=int) #5000 to 50
+parser.add_argument('--warmup_iters', default=10, help='warmup_iters', type=int) #1000 to 10
 
 
 def parse_args():
@@ -85,6 +85,7 @@ def load_cfg(args, num_classes):
     cfg.DATASETS.TRAIN = ("dataset_train",)
     cfg.DATASETS.TEST = tuple(args.test_dataset_names)
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = num_classes
+    cfg.INPUT.MASK_FORMAT = "bitmask" #to change mask format from polygon to RLE
 
     cfg.ADDITIONAL_MODULES.USE_MASK_GT = args.mask_gt
     cfg.ADDITIONAL_MODULES.USE_MASK =  True if "mask" in args.contact_state_modality else args.predict_mask
