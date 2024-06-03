@@ -66,7 +66,7 @@ class EhoiDatasetMapperv1(BaseEhoiDatasetMapper):
 			utils.transform_instance_annotations(annotation, transforms, image_t.shape[1:])    
 		
 		try: 
-			instances = utils.annotations_to_instances(dataset_dict["annotations"], image_t.shape[1:])
+			instances = utils.annotations_to_instances(dataset_dict["annotations"], image_t.shape[1:], mask_format="bitmask") # mask_format = "bitmask" to accept mask in RLE format
 			ids = [x["id"] for x in dataset_dict["annotations"]]
 			contact_states = [x["contact_state"] for x in dataset_dict["annotations"]]
 			sides = [x["hand_side"] for x in dataset_dict["annotations"]]

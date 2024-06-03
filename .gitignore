@@ -42,6 +42,7 @@ _darcs
 /detectron2/model_zoo/configs
 /datasets/*
 /weights/*
+/data/*
 /models
 /snippet
 
