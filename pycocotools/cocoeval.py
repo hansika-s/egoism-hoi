@@ -194,13 +194,6 @@ class COCOeval:
         iscrowd = [int(o['iscrowd']) for o in gt]
         ious = maskUtils.iou(d,g,iscrowd)
         return ious
-        # Check if g, d is in the correct format before computing IOU
-        # if not (check_format(d) and check_format(g)):
-        #     print(f"Error: d or g data for imgId: {imgId}, catId: {catId} is not in a valid format for maskUtils.iou")
-        # else:
-        #     iscrowd = [int(o['iscrowd']) for o in gt]
-        #     ious = maskUtils.iou(d, g, iscrowd)
-        #     return ious
 
     def computeOks(self, imgId, catId):
         p = self.params
@@ -273,10 +266,6 @@ class COCOeval:
         dt = [dt[i] for i in dtind[0:maxDet]]
         iscrowd = [int(o['iscrowd']) for o in gt]
         # load computed ious
-        # if len(self.ious[imgId, catId]) > 0:
-        #     ious = self.ious[imgId, catId][:, gtind]
-        # else:
-        #     print(f"Warning: self.ious[{imgId}, {catId}] is empty")
         ious = self.ious[imgId, catId][:, gtind] if len(self.ious[imgId, catId]) > 0 else self.ious[imgId, catId]
 
         T = len(p.iouThrs)
