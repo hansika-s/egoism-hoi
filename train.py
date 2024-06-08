@@ -7,6 +7,7 @@ import json
 import torch
 from collections import OrderedDict
 import logging
+import datetime
 
 # import some common detectron2 utilities
 from detectron2.config import get_cfg 
@@ -41,13 +42,13 @@ parser.add_argument('--contact_state_modality', default="mask+rgb+depth+fusion",
 parser.add_argument('--contact_state_cnn_input_size', default="128", help="input size for the CNN contact state classification module", type=int)
 
 parser.add_argument('--cuda_device', default=0, help='CUDA device id', type=int)
-parser.add_argument('--base_lr', default=0.001, help='base learning rate.', type=float)
+parser.add_argument('--base_lr', default=10e-5, help='base learning rate.', type=float)
 parser.add_argument('--ims_per_batch', default=4, help='ims per batch', type=int)
-parser.add_argument('--solver_steps', default=[500], help='solver_steps', nargs='+', type=int) #[40000, 60000] to [500]
-parser.add_argument('--max_iter', default=1000, help='max_iter', type=int) #80000 to 1000
-parser.add_argument('--checkpoint_period', default=50, help='checkpoint_period', type=int) #5000 to 50
-parser.add_argument('--eval_period', default=50, help='eval_period', type=int) #5000 to 50
-parser.add_argument('--warmup_iters', default=10, help='warmup_iters', type=int) #1000 to 10
+parser.add_argument('--solver_steps', default=[500, 1000, 2000, 4000], help='solver_steps', nargs='+', type=int) #[40000, 60000] 
+parser.add_argument('--max_iter', default=5000, help='max_iter', type=int) #80000 
+parser.add_argument('--checkpoint_period', default=1000, help='checkpoint_period', type=int) #5000 
+parser.add_argument('--eval_period', default=500, help='eval_period', type=int) #5000 
+parser.add_argument('--warmup_iters', default=1, help='warmup_iters', type=int) #1000 
 
 
 def parse_args():
@@ -102,7 +103,9 @@ def load_cfg(args, num_classes):
 
     cfg.MODEL.WEIGHTS = args.weights
 
-    cfg.OUTPUT_DIR = "./output_dir/last_training/"
+    timestamp = datetime.datetime.now().strftime("%m-%d_%H-%M")
+    output_dir = f"./output_dir/last_training_{timestamp}/"
+    cfg.OUTPUT_DIR = output_dir
     cfg.freeze()
     setup_logger(output = cfg.OUTPUT_DIR)
 
@@ -194,6 +197,7 @@ if __name__ == "__main__":
 
             optimizer.zero_grad()
             losses.backward()
+            # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)  # Add gradient clipping
             optimizer.step()
             scheduler.step()
             storage.put_scalar("lr", optimizer.param_groups[0]["lr"], smoothing_hint=False)

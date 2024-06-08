@@ -184,10 +184,23 @@ class COCOeval:
         else:
             raise Exception('unknown iouType for iou computation')
 
+        # Ensure the detection and ground truth formats are as expected
+        if not (isinstance(d, list) and all(isinstance(b, list) and len(b) == 4 for b in d)):
+            raise ValueError(f"Detections for imgId {imgId}, catId {catId} must be a list of bounding boxes (Nx4). Got: {d}")
+        if not (isinstance(g, list) and all(isinstance(b, list) and len(b) == 4 for b in g)):
+            raise ValueError(f"Ground truths for imgId {imgId}, catId {catId} must be a list of bounding boxes (Nx4). Got: {g}") 
+    
         # compute iou between each dt and gt region
         iscrowd = [int(o['iscrowd']) for o in gt]
         ious = maskUtils.iou(d,g,iscrowd)
         return ious
+        # Check if g, d is in the correct format before computing IOU
+        # if not (check_format(d) and check_format(g)):
+        #     print(f"Error: d or g data for imgId: {imgId}, catId: {catId} is not in a valid format for maskUtils.iou")
+        # else:
+        #     iscrowd = [int(o['iscrowd']) for o in gt]
+        #     ious = maskUtils.iou(d, g, iscrowd)
+        #     return ious
 
     def computeOks(self, imgId, catId):
         p = self.params
@@ -260,6 +273,10 @@ class COCOeval:
         dt = [dt[i] for i in dtind[0:maxDet]]
         iscrowd = [int(o['iscrowd']) for o in gt]
         # load computed ious
+        # if len(self.ious[imgId, catId]) > 0:
+        #     ious = self.ious[imgId, catId][:, gtind]
+        # else:
+        #     print(f"Warning: self.ious[{imgId}, {catId}] is empty")
         ious = self.ious[imgId, catId][:, gtind] if len(self.ious[imgId, catId]) > 0 else self.ious[imgId, catId]
 
         T = len(p.iouThrs)
@@ -532,3 +549,21 @@ class Params:
         self.iouType = iouType
         # useSegm is deprecated
         self.useSegm = None
+
+def check_format(objs):
+  """
+  This function checks if the input data `objs` is in a valid format for maskUtils.iou.
+
+  Args:
+    objs: The data to be checked. Can be RLEs, bounding boxes (Nx4 format), or list.
+
+  Returns:
+    True if the format is valid, False otherwise.
+  """
+
+  if type(objs) == list:
+
+    isbox = np.all(np.array([(len(obj)==4) and ((type(obj)==list) or (type(obj)==np.ndarray)) for obj in objs]))
+    isrle = np.all(np.array([type(obj) == dict for obj in objs]))
+
+  return isbox or isrle  # Return True if either format is valid
