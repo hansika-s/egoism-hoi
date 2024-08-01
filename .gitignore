@@ -43,6 +43,7 @@ _darcs
 /datasets/*
 /weights/*
 /data/*
+/test_images/*
 /models
 /snippet
 

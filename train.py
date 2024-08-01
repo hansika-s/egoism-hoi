@@ -44,11 +44,11 @@ parser.add_argument('--contact_state_cnn_input_size', default="128", help="input
 parser.add_argument('--cuda_device', default=0, help='CUDA device id', type=int)
 parser.add_argument('--base_lr', default=10e-5, help='base learning rate.', type=float)
 parser.add_argument('--ims_per_batch', default=4, help='ims per batch', type=int)
-parser.add_argument('--solver_steps', default=[500, 1000, 2000, 4000], help='solver_steps', nargs='+', type=int) #[40000, 60000] 
-parser.add_argument('--max_iter', default=5000, help='max_iter', type=int) #80000 
-parser.add_argument('--checkpoint_period', default=1000, help='checkpoint_period', type=int) #5000 
-parser.add_argument('--eval_period', default=500, help='eval_period', type=int) #5000 
-parser.add_argument('--warmup_iters', default=1, help='warmup_iters', type=int) #1000 
+parser.add_argument('--solver_steps', default=[500, 1000, 2000], help='solver_steps', nargs='+', type=int) #[40000, 60000] 
+parser.add_argument('--max_iter', default=80000, help='max_iter', type=int) #80000 
+parser.add_argument('--checkpoint_period', default=5000, help='checkpoint_period', type=int) #5000 
+parser.add_argument('--eval_period', default=5000, help='eval_period', type=int) #5000 
+parser.add_argument('--warmup_iters', default=1000, help='warmup_iters', type=int) #1000 
 
 
 def parse_args():

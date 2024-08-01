@@ -83,4 +83,4 @@ if __name__ == "__main__":
 
     results = do_test(cfg, model, converter = converter, mapper= mapper_test, data = data_anns_test_sup)
     print(results)
-    print(f'{results["ehoi"]["AP Hand"]}\t{results["ehoi"]["mAP Objects"]}\t{results["ehoi"]["mAP Target Objects"]}\t{results["ehoi"]["AP Hand + Side"]}\t{results["ehoi"]["AP Hand + State"]}\t{results["ehoi"]["mAP Hand + Target Objects"]}\t{results["ehoi"]["mAP All"]}')
+    print(f'{results["ehoi"]["AP Hand"]}\t{results["ehoi"]["mAP Objects"]}\t{results["ehoi"]["AP Hand + Side"]}\t{results["ehoi"]["AP Hand + State"]}\t{results["ehoi"]["mAP Hand + Target Objects"]}\t{results["ehoi"]["mAP All"]}') #\t{results["ehoi"]["mAP Target Objects"]}

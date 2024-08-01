@@ -14,9 +14,11 @@ def normalizeData(data):
 class BaseEhoiVisualizer:
     def __init__(self, cfg, metadata, converter: Converter, **kwargs):
         self._thing_classes = metadata.as_dict()["thing_classes"]
+        print(self._thing_classes)
         self._id_hand = self._thing_classes.index("hand") if "hand" in self._thing_classes else self._thing_classes.index("mano")
         self.cfg = cfg
-        self.class_names = {v: metadata.thing_classes[k] for k, v in metadata.thing_dataset_id_to_contiguous_id.items()}
+        # self.class_names = {v: metadata.thing_classes[k] for k, v in metadata.thing_dataset_id_to_contiguous_id.items()}
+        self.class_names = {v: metadata.thing_classes[k - 1] for k, v in metadata.thing_dataset_id_to_contiguous_id.items()}
         self._input_size = (cfg.UTILS.TARGET_SHAPE_W, cfg.UTILS.TARGET_SHAPE_H)
 
         ###PARAMS

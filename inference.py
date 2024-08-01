@@ -20,7 +20,7 @@ from detectron2.utils.converters import *
 
 ##### ArgumentParser
 parser = argparse.ArgumentParser(description='Inference script')
-parser.add_argument('--dataset', dest='ref_dataset_json', help='reference json', default='./data/ref_enigma.json', type=str)
+parser.add_argument('--dataset', dest='ref_dataset_json', help='reference json', default='./data/coco/ref_enigma.json', type=str)
 parser.add_argument('-w', '--weights_path', dest='weights', help='weights path', type=str, required = True)
 parser.add_argument('--cfg_path', dest='cfg_path', help='cfg .yaml path', type=str)
 parser.add_argument('--nms', dest='nms', help='nms', default = 0.3, type=float)
@@ -38,7 +38,7 @@ parser.add_argument('--hide_bbs', action='store_true', default=False)
 parser.add_argument('--hide_masks', action='store_true', default=False)
 parser.add_argument('--save_masks', action='store_true', help='save masks of the image (only supported for images)', default=False)
 parser.add_argument('--save_depth_map', action='store_true', help='save depth of the image (only supported for images)', default=False)
-parser.add_argument('--thresh', help='thresh of the score', default=0.5, type = float)
+parser.add_argument('--thresh', help='thresh of the score', default=0.8, type = float)
 
 args = parser.parse_args()
 
@@ -53,25 +53,25 @@ def clear_output(str_):
         sys.stdout.write("\033[K\033[F")
 
 def load_cfg():
-    register_coco_instances("val_set", {}, args.ref_dataset_json, args.ref_dataset_json)
-    _ = DatasetCatalog.get("val_set")
-    metadata = MetadataCatalog.get("val_set")
+    register_coco_instances("new_set", {}, args.ref_dataset_json, args.ref_dataset_json)
+    _ = DatasetCatalog.get("new_set")
+    metadata = MetadataCatalog.get("new_set")
     weights_path = args.weights
     cfg_path = os.path.join(weights_path.split("model_")[0], "cfg.yaml") if not args.cfg_path else args.cfg_path
 
     cfg = CfgNode(CfgNode.load_yaml_with_base(cfg_path))
     cfg.set_new_allowed(True)
-    cfg.DATASETS.TEST = ("val_set",)
+    cfg.DATASETS.TEST = ("new_set",)
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(metadata.as_dict()["thing_dataset_id_to_contiguous_id"])
     cfg.MODEL.WEIGHTS = weights_path
     cfg.OUTPUT_DIR = "./output_dir/test"
     
     cfg.ADDITIONAL_MODULES.NMS_THRESH = args.nms
     cfg.UTILS.VISUALIZER.THRESH_OBJS = args.thresh
-    cfg.UTILS.VISUALIZER.DRAW_EHOI = not args.hide_ehois
-    cfg.UTILS.VISUALIZER.DRAW_MASK = not args.hide_masks
-    cfg.UTILS.VISUALIZER.DRAW_OBJS = not args.hide_bbs
-    cfg.UTILS.VISUALIZER.DRAW_DEPTH = not args.hide_depth
+    # cfg.UTILS.VISUALIZER.DRAW_EHOI = not args.hide_ehois
+    # cfg.UTILS.VISUALIZER.DRAW_MASK = not args.hide_masks
+    # cfg.UTILS.VISUALIZER.DRAW_OBJS = not args.hide_bbs
+    # cfg.UTILS.VISUALIZER.DRAW_DEPTH = not args.hide_depth
 
     os.makedirs(cfg.OUTPUT_DIR, exist_ok = True)
     cfg.freeze()
@@ -86,6 +86,8 @@ def main():
     random.seed(args.seed)
     np.random.seed(args.seed)
     cfg, metadata = load_cfg()
+    print(cfg)
+    print(metadata)
 
     ###INIT MODEL
     converter = MMEhoiNetConverterv1(cfg, metadata)
@@ -166,7 +168,7 @@ def main():
                 ret, frame = current_video_cap.read()
                 r_ = model([mapper(frame)])
                 im_r = visualizer.draw_results(frame, r_[0])
-                current_video_writer = cv2.VideoWriter(save_video_path, cv2.VideoWriter_fourcc(*'mp4v'), current_video_cap.get(5), (im_r.shape[1], im_r.shape[0]))
+                current_video_writer = cv2.VideoWriter(save_video_path, cv2.VideoWriter_fourcc(*'mp4v'), 15, (im_r.shape[1], im_r.shape[0]))
                 duration_of_record_frames = args.duration_of_record_sec * current_video_cap.get(5) + args.skip_the_fist_frames
                 while(ret):
                     frame_number = int(current_video_cap.get(1)) - 1

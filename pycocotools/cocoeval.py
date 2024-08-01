@@ -186,10 +186,10 @@ class COCOeval:
 
         # Ensure the detection and ground truth formats are as expected
         if not (isinstance(d, list) and all(isinstance(b, list) and len(b) == 4 for b in d)):
-            raise ValueError(f"Detections for imgId {imgId}, catId {catId} must be a list of bounding boxes (Nx4). Got: {d}")
+                raise ValueError(f"Detections for imgId {imgId}, catId {catId} must be a list of bounding boxes (Nx4). g: {g}, d: {d}")
         if not (isinstance(g, list) and all(isinstance(b, list) and len(b) == 4 for b in g)):
-            raise ValueError(f"Ground truths for imgId {imgId}, catId {catId} must be a list of bounding boxes (Nx4). Got: {g}") 
-    
+                raise ValueError(f"Ground truths for imgId {imgId}, catId {catId} must be a list of bounding boxes (Nx4). g: {g}, d: {d}") 
+
         # compute iou between each dt and gt region
         iscrowd = [int(o['iscrowd']) for o in gt]
         ious = maskUtils.iou(d,g,iscrowd)
@@ -538,21 +538,3 @@ class Params:
         self.iouType = iouType
         # useSegm is deprecated
         self.useSegm = None
-
-def check_format(objs):
-  """
-  This function checks if the input data `objs` is in a valid format for maskUtils.iou.
-
-  Args:
-    objs: The data to be checked. Can be RLEs, bounding boxes (Nx4 format), or list.
-
-  Returns:
-    True if the format is valid, False otherwise.
-  """
-
-  if type(objs) == list:
-
-    isbox = np.all(np.array([(len(obj)==4) and ((type(obj)==list) or (type(obj)==np.ndarray)) for obj in objs]))
-    isrle = np.all(np.array([type(obj) == dict for obj in objs]))
-
-  return isbox or isrle  # Return True if either format is valid
